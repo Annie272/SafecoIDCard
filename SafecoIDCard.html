@@ -29,6 +29,7 @@
       <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">
         ID Card Safeco Form
       </h2>
+
       <div class="bg-gray-50 border rounded-xl p-6 shadow-inner">
         <h3 class="text-xl font-semibold mb-4 text-gray-700">Policy Changes</h3>
 
@@ -46,28 +47,13 @@
           />
         </div>
 
-        <!-- Policy Action -->
-        <div class="mb-3">
-          <label
-            for="00NU7000005zuNN"
-            class="block text-sm font-medium text-gray-700"
-          >
-            Policy Action<span class="star">*</span>
-          </label>
-          <select
-            id="00NU7000005zuNN"
-            name="00NU7000005zuNN"
-            class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm"
-          >
-            <option value="">--None--</option>
-            <option value="Replace Vehicle">Replace Vehicle</option>
-            <option value="Add Vehicle">Add Vehicle</option>
-            <option value="Remove Vehicle">Remove Vehicle</option>
-            <option value="Add Driver">Add Driver</option>
-            <option value="Remove Driver">Remove Driver</option>
-            <option value="ID Card">ID Card</option>
-          </select>
-        </div>
+        <!-- Policy Action (hidden, always "ID Card") -->
+        <input
+          type="hidden"
+          id="00NU7000005zuNN"
+          name="00NU7000005zuNN"
+          value="ID Card"
+        />
 
         <!-- Policy Number -->
         <div class="mb-3">
@@ -172,23 +158,21 @@
         const proceedBtn = document.getElementById("proceedBtn");
         const editBtn = document.getElementById("editBtn");
 
-        // Fields to validate
+        // Only validate Email + Policy Number (Policy Action is hidden and always "ID Card")
         const fieldData = [
           { id: "email", label: "Email", type: "email" },
-          { id: "00NU7000005zuNN", label: "Policy Action" },
           { id: "00NU7000005zuX3", label: "Policy Number" },
         ];
 
         function validateFields() {
           const missing = [];
           fieldData.forEach((field) => {
+            const input = document.getElementById(field.id);
             if (field.type === "email") {
-              const input = document.getElementById(field.id);
               if (!input.value.trim() || !input.checkValidity()) {
                 missing.push(field.label);
               }
             } else {
-              const input = document.getElementById(field.id);
               if (!input.value.trim()) {
                 missing.push(field.label);
               }
@@ -222,13 +206,12 @@
           form.submit();
         });
 
-        // Clicking outside closes dialog
         window.addEventListener("click", (e) => {
           if (e.target === dialog) {
             dialog.classList.add("hidden");
           }
         });
-        // Escape key closes dialog
+
         window.addEventListener("keydown", (e) => {
           if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
             dialog.classList.add("hidden");

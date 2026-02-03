@@ -51,7 +51,7 @@
         <input
           type="hidden"
           id="00NU7000005zuNN"
-          name="00NU7000005zuNN"
+          name="Policy_Action__c"
           value="ID Card"
         />
 
@@ -66,7 +66,7 @@
           <input
             type="text"
             id="00NU7000005zuX3"
-            name="00NU7000005zuX3"
+            name="Policy_Number__c"
             class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm"
             autocomplete="off"
           />
@@ -77,38 +77,30 @@
       <input type="hidden" name="oid" value="00DU7000006EuID" />
       <input
         type="hidden"
-        name="recordType"
-        id="recordType"
-        value="012U7000003Ie25IAC"
-      />
-      <input
-        type="hidden"
         name="retURL"
         value="https://bennettandporter.com/"
       />
       <input
         type="hidden"
         name="first_name"
-        value="ID Card Test Demo Safeco New"
+        value="ID Card"
       />
-      <input type="hidden" name="last_name" value="Test Demo" />
+      <input type="hidden" name="last_name" value="Safeco" />
       <input type="hidden" name="status" value="New" />
-      <input type="hidden" name="phone" value="28436836129" />
+      <input type="hidden" name="phone" value="28134736129" />
       <input type="hidden" name="lead_source" value="Web Form" />
       <input type="hidden" name="delete_Action_Form__c" value="1" />
-                        <input type="hidden" name="Carrier__c" value ="Safeco">
+      <input type="hidden" name="Carrier__c" value ="Safeco">
+      <input type="hidden" name="Form_Captured_Data__c" />
+      <input type="hidden" name="Form_Missing_Data__c" />
+      
 
       <input
         type="hidden"
         name="company"
-        value="ID Card Test Demo Safeco New"
+        value="ID Card Safeco"
       />
-      <input
-        type="hidden"
-        name="Debug_Notes__c"
-        value="Safeco Test: 2025-06-27 07:21AM"
-      />
-
+      
       <!-- Submit button -->
       <div class="flex justify-end mt-6">
         <button
@@ -151,76 +143,119 @@
       </div>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("mainForm");
-        const reviewBtn = document.getElementById("reviewBtn");
-        const dialog = document.getElementById("dialog");
-        const dialogTitle = document.getElementById("dialogTitle");
-        const missingFieldsList = document.getElementById("missingFieldsList");
-        const proceedBtn = document.getElementById("proceedBtn");
-        const editBtn = document.getElementById("editBtn");
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-        // Only validate Email + Policy Number (Policy Action is hidden and always "ID Card")
-        const fieldData = [
-          { id: "email", label: "Email", type: "email" },
-          { id: "00NU7000005zuX3", label: "Policy Number" },
-        ];
+  const form = document.getElementById("mainForm");
+  const reviewBtn = document.getElementById("reviewBtn");
+  const dialog = document.getElementById("dialog");
+  const dialogTitle = document.getElementById("dialogTitle");
+  const missingFieldsList = document.getElementById("missingFieldsList");
+  const proceedBtn = document.getElementById("proceedBtn");
+  const editBtn = document.getElementById("editBtn");
 
-        function validateFields() {
-          const missing = [];
-          fieldData.forEach((field) => {
-            const input = document.getElementById(field.id);
-            if (field.type === "email") {
-              if (!input.value.trim() || !input.checkValidity()) {
-                missing.push(field.label);
-              }
-            } else {
-              if (!input.value.trim()) {
-                missing.push(field.label);
-              }
-            }
-          });
-          return missing;
+  // Only validate Email + Policy Number (Policy Action is hidden and always "ID Card")
+  const fieldData = [
+    { id: "email", label: "Email", type: "email" },
+    { id: "00NU7000005zuX3", label: "Policy Number" },
+  ];
+
+  function validateFields() {
+    const missing = [];
+    fieldData.forEach((field) => {
+      const input = document.getElementById(field.id);
+      if (field.type === "email") {
+        if (!input.value.trim() || !input.checkValidity()) {
+          missing.push(field.label);
         }
+      } else {
+        if (!input.value.trim()) {
+          missing.push(field.label);
+        }
+      }
+    });
+    return missing;
+  }
 
-        reviewBtn.addEventListener("click", () => {
-          const missing = validateFields();
-          if (missing.length) {
-            dialogTitle.textContent =
-              "Below Mandatory Fields are missing and the Team will contact you shortly.";
-            missingFieldsList.innerHTML = missing
-              .map((f) => `<li>${f}</li>`)
-              .join("");
-          } else {
-            dialogTitle.textContent =
-              "All mandatory fields are completed. Ready to submit your request?";
-            missingFieldsList.innerHTML = "";
-          }
-          dialog.classList.remove("hidden");
-        });
+  // =========================
+  // FORM CAPTURE & MISSING
+  // =========================
+  function captureFormAudit() {
+    const captured = [];
+    const missing = [];
 
-        editBtn.addEventListener("click", () => {
-          dialog.classList.add("hidden");
-        });
+    fieldData.forEach(field => {
+      const el = document.getElementById(field.id);
+      if (el && el.value.trim()) {
+        captured.push(`${field.label} = ${el.value.trim()}`);
+      } else {
+        missing.push(field.label);
+      }
+    });
 
-        proceedBtn.addEventListener("click", () => {
-          dialog.classList.add("hidden");
-          form.submit();
-        });
+    let capturedField = document.getElementById("Form_Captured_Data__c");
+    let missingField = document.getElementById("Form_Missing_Data__c");
 
-        window.addEventListener("click", (e) => {
-          if (e.target === dialog) {
-            dialog.classList.add("hidden");
-          }
-        });
+    if (!capturedField) {
+      capturedField = document.createElement("input");
+      capturedField.type = "hidden";
+      capturedField.name = "Form_Captured_Data__c";
+      capturedField.id = "Form_Captured_Data__c";
+      form.appendChild(capturedField);
+    }
 
-        window.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
-            dialog.classList.add("hidden");
-          }
-        });
-      });
-    </script>
+    if (!missingField) {
+      missingField = document.createElement("input");
+      missingField.type = "hidden";
+      missingField.name = "Form_Missing_Data__c";
+      missingField.id = "Form_Missing_Data__c";
+      form.appendChild(missingField);
+    }
+
+    capturedField.value = captured.join("\n");
+    missingField.value = missing.join("\n");
+  }
+
+  // =========================
+  // DIALOG FLOW (unchanged)
+  // =========================
+  reviewBtn.addEventListener("click", () => {
+    const missing = validateFields();
+    if (missing.length) {
+      dialogTitle.textContent =
+        "Below Mandatory Fields are missing and the Team will contact you shortly.";
+      missingFieldsList.innerHTML = missing.map((f) => `<li>${f}</li>`).join("");
+    } else {
+      dialogTitle.textContent =
+        "All mandatory fields are completed. Ready to submit your request?";
+      missingFieldsList.innerHTML = "";
+    }
+    dialog.classList.remove("hidden");
+  });
+
+  editBtn.addEventListener("click", () => {
+    dialog.classList.add("hidden");
+  });
+
+  proceedBtn.addEventListener("click", () => {
+    dialog.classList.add("hidden");
+
+    captureFormAudit();
+
+    form.submit();
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.classList.add("hidden");
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
+      dialog.classList.add("hidden");
+    }
+  });
+
+});
+</script>
   </body>
 </html>
